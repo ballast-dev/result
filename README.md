@@ -1,48 +1,88 @@
-# `Result` type
+# Result
 
-**Don't throw your errors, handle them**
+A Rust-like Result type implementation in C++.
 
-If you have the following requirements:
-
-1. No exceptions handling allowed
-1. Need for consistent error handling
-1. Compatible with C++11 _and optimized for C++20_
-
-Then try out `Result` type! One header `result.h` and 
-you are off to the races. 
-
-## Example
-
-There are more in `examples/`
+## Example Usage
 
 ```cpp
-#include "result.h"
-#include <iostream>
-#include <string>
+#include <result.h>
 
-using MyType = Result<int, std::string>;
-
-MyType divide(int a, int b) {
-  if (b == 0) {
-    return MyType::Err("Division by zero");
-  }
-  return MyType::Ok(a / b);
+Result<int, std::string> divide(int a, int b) {
+    if (b == 0) {
+        return Err("Division by zero");
+    }
+    return Ok(a / b);
 }
 
 int main() {
-  auto result = divide(10, 2);
-  if (result.is_ok()) {
-    std::cout << "Result: " << result.unwrap() << "\n";
-  } else {
-    std::cout << "Error: " << result.unwrap_err() << "\n";
-  }
-
-  auto error_result = divide(10, 0);
-  std::cout << "Handled Error: " << error_result.unwrap_or(-1) << "\n";
-
-  return 0;
+    auto result = divide(10, 2);
+    
+    if (result.is_ok()) {
+        std::cout << "Result: " << result.unwrap() << std::endl;
+    } else {
+        std::cout << "Error: " << result.unwrap_err() << std::endl;
+    }
+    
+    return 0;
 }
 ```
 
-> Deeply inspired by Rust to create a fully templated type
-> to handle common patterns. 
+## Building
+
+### Using Nix (Recommended)
+
+1. Install Nix:
+   ```bash
+   # Remove any existing Nix installation
+   sudo rm -rf /nix
+   
+   # Install Nix using the official installer
+   sh <(curl -L https://nixos.org/nix/install) --daemon
+   ```
+
+2. Enable Nix experimental features:
+   ```bash
+   mkdir -p ~/.config/nix
+   echo "experimental-features = nix-command flakes" >> ~/.config/nix/nix.conf
+   ```
+
+3. Enter the Nix Shell:
+   ```bash
+   nix develop
+   ```
+   Optionally add `--allow-dirty`
+
+### Using Meson
+
+1. Build the project:
+   ```bash
+   # Configure debug build
+   meson setup build --buildtype=debug
+   # Configure release build
+   meson setup build --buildtype=release
+   
+   # Build the project
+   meson compile -C build
+   
+   # Run all tests
+   meson test -C build
+   ```
+
+3. Run specific examples:
+   ```bash
+   # All binaries are in the build/ directory
+   ./build/arithmetic
+   ./build/error_handling
+   ./build/optional
+   ./build/result_chain
+   ```
+
+All build artifacts, including binaries and intermediate files, are kept in the `build/` directory. This includes:
+- Compiled binaries
+- Build configuration files
+- Test results
+- Meson's internal state
+
+## License
+
+MIT License - see LICENSE file for details
